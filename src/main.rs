@@ -1,11 +1,13 @@
 extern crate rand;
-use::rand::{distributions::Uniform, Rng};
+use rand::{distributions::Uniform, Rng};
+use std::time::Instant;
+use std::fs::File;
+use std::io::Write;
 
-use std::fmt::Write;
 
 //const MAX_VEC_SIZE: usize = 1_000_000_000;
 
-const MAX_VEC_SIZE: usize = 1_000_000; //test size
+const MAX_VEC_SIZE: usize = 100; //test size
 
 fn new_big_integer(len: usize) -> Option<Vec<i8>> {
     // Retruns a random big integer in vec,
@@ -29,11 +31,16 @@ fn get_big_integer_string(num: &[i8]) -> String {
     // Returns the big integer in string format,
     // vec![5, 4, 3, 2, 1] is converted into "12345".
 
-    let mut big_num_str = String::with_capacity(num.len());
-    for n in num.iter().rev() {
-        write!(big_num_str, "{}", n).unwrap();
-    }
-    big_num_str
+    //let mut big_num_str = String::with_capacity(num.len());
+    num.iter().rev().map(ToString::to_string).collect()
+    //for n in num.iter().rev() {
+    //    write!(big_num_str, "{}", n).unwrap();
+    //}
+    //big_num_str
+}
+#[test]
+fn test_get_big_integer_string() {
+    assert_eq!(get_big_integer_string(&[5,4,3,2,1]), "12345");
 }
 
 fn multi_big_integer(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>> {
@@ -81,38 +88,6 @@ fn test_multi_big_integer() {
     assert_eq!(multi_big_integer(&[4,2,2,1,3,7,9,6,5,5],
                                  &[3,0,2,2,1,6,3,2,0,6],),
                Some(vec![2,7,4,6,2,5,6,1,3,8,6,9,0,0,9,9,4,5,3,3]));
-}
-fn _run_multi_case() {
-    let mut len = 10;
-                                                                               
-    loop {
-        match (new_big_integer(len), new_big_integer(len)) {
-            (Some(num1), Some(num2)) => {
-                let string1 = get_big_integer_string(&num1);
-                let string2 = get_big_integer_string(&num2);
-                                                                               
-                println!("The origin number is {} and {}.", string1, string2);
-                                                                               
-                match multi_big_integer(&num1, &num2) {
-                    Some(num) => {
-                        let bn_str = get_big_integer_string(&num);
-                                                                               
-                        println!("The mutiply result is {}.", bn_str);
-                    }
-                    _ => (),
-                }
-                                                                               
-            }
-            _ => break,
-        };
-                                                                               
-                                                                               
-        len *= 10;
-        if len > 1000 {
-            break;
-        }
-                                                                               
-    };
 }
 fn add_big_integer(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>> {
     //We assume that the length of num1 is not less than that of num2.
@@ -167,8 +142,9 @@ fn shift_big_integer(num: &[i8], shift_size: usize) -> Option<Vec<i8>> {
 fn multi_big_integer_recursion(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>> {
     // We assume that num1 and num2 are of the same length,
     // both of them have no leading zeros.
+    // But it is powerful to deal with unequal lengths and leading 0's
     // num1 = a1 * 10^{n/2} + a0, num2 = b1 * 10^{m/2} + b0
-    // num1 * num2 = a0b0 + (a0b1+a1b0) * 10^{n/2} + a1b1 * 10^{n}
+    // num1 * num2 = a1b1*10^{n/2+m/2} + a0b1*10^{m/2} + a1b0*10^{n/2} + a0b0
 
     if num1.len() == 1 || num2.len() == 1 {
         return multi_big_integer(&num1, &num2);
@@ -191,7 +167,7 @@ fn multi_big_integer_recursion(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>> {
                                                    num2.len()/2).unwrap();
             let mut a1b0_shift = shift_big_integer(&a1b0, 
                                                    num1.len()/2).unwrap();
-            println!("{:?}, {:?}, {:?}, {:?}", a1b1_shift, a0b1_shift, a1b0_shift, a0b0);
+            //println!("{:?}, {:?}, {:?}, {:?}", a1b1_shift, a0b1_shift, a1b0_shift, a0b0);
 
             add_big_integer(&add_big_integer(&a1b1_shift, &a0b0).unwrap(),
                             &add_big_integer(&a0b1_shift, &a1b0_shift).unwrap())
@@ -269,21 +245,21 @@ fn test_sub_big_integer() {
     assert_eq!(sub_big_integer(&[1,0,0,1], &[9,9]), Some(vec![2,0,9]));
 }
 fn multi_big_integer_recursion_plus(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>> {
-    // We assume that num1 and num2 are of the same length,
+    // The num1 and num2 must be of the same length,
     // both of them have no leading zeros.
     // num1 = a1 * 10^{n/2} + a0, num2 = b1 * 10^{n/2} + b0
     // Idea1:
-    // num1 * num2 = a0b0 + (a0b1+a1b0) * 10^{n/2} + a1b1 * 10^{n}
+    // num1 * num2 = a0b0 + (a0b1+a1b0) * 10^{n/2} + a1b1 * 10^{n/2+n/2}
     //             = a0b0 + ((a0-a1)(b1-b0) + a0b0 + a1b1) * 10^{n/2} 
-    //                    + a1b1 * 10^{n}
+    //                    + a1b1 * 10^{n/2+n/2}
     // In this expression, the signs of (a0-a1) and (b1-b0) are all not sure.
     //
     // Idea2:
-    // num1 * num2 = a0b0 + (a0b1+a1b0) * 10^{n/2} + a1b1 * 10^{n}
+    // num1 * num2 = a0b0 + (a0b1+a1b0) * 10^{n/2} + a1b1 * 10^{n/2}
     //             = a0b0 + ((a0+a1)(b0+b1) - a0b0 - a1b1) * 10^{n/2} 
-    //                    + a1b1 * 10^{n}
+    //                    + a1b1 * 10^{n/2}
     //             = a0b0 + ((a0+a1)(b0+b1) - (a0b0 + a1b1)) * 10^{n/2} 
-    //                    + a1b1 * 10^{n}
+    //                    + a1b1 * 10^{n/2+n/2}
     // It is easy to handle the sign, (a0+a1)(b0+b1) must be greater than
     // the sum of a0b0 and a1b1, since a0b1+a1b0 is always a postive number. 
 
@@ -296,45 +272,32 @@ fn multi_big_integer_recursion_plus(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>>
     let b0 = &num2[..num2.len()/2]; //low part of num2
     let b1 = &num2[num2.len()/2..]; //high part of num2
 
+    //println!("a0 = {:?}, a1 = {:?}, b0 = {:?}, b1 = {:?}", a0, a1, b0, b1);                                                                              
+
     let a0_add_a1 = add_big_integer(a0, a1).unwrap();
     let b0_add_b1 = add_big_integer(b0, b1).unwrap();
+    
+    //println!("a0+a1 = {:?}, b0+b1 = {:?}", a0_add_a1, b0_add_b1);                                                                              
     
     match (multi_big_integer_recursion(&a0_add_a1, &b0_add_b1),
            multi_big_integer_recursion(a0, b0),
            multi_big_integer_recursion(a1, b1)) {
         (Some(product_ab), Some(a0b0), Some(a1b1)) => {
-            let add_ab = add_big_integer(&a0_add_a1, &b0_add_b1).unwrap();
+            let add_ab = add_big_integer(&a0b0, &a1b1).unwrap();
             let mid = sub_big_integer(&product_ab, &add_ab).unwrap();
+
+            //println!("add_ab = {:?}, mid = {:?}", add_ab, mid);
 
             let mut a1b1_shift = shift_big_integer(&a1b1, 
                                                    num1.len()/2+num2.len()/2).unwrap();
             let mut mid_shift = shift_big_integer(&mid,
                                                    num2.len()/2).unwrap();
-                                                                                          
+            
+            //println!("high = {:?}, mid = {:?}, low = {:?}", a1b1_shift, mid_shift, a0b0);                                                                              
+
             add_big_integer(&add_big_integer(&a1b1_shift, &a0b0).unwrap(),
                             &mid_shift)
 
-            //match add_big_integer(&a0b0, &a1b1) {
-            //    Some(a0b0_add_a1b1) => {
-
-            //        let mut mid = sub_big_integer(&product_ab,
-            //                                      &a0b0_add_a1b1)
-            //                                    .unwrap();
-            //        mid.reverse();
-            //        mid.append(&mut vec![0; num1.len()/2]);
-            //        mid.reverse();
-
-            //        let mut high = a1b1.clone();
-            //        high.reverse();
-            //        high.append(&mut vec![0; num1.len()-1]);
-            //        high.reverse();
-            //        match add_big_integer(&mid, &high) {
-            //            Some(tmp) => add_big_integer(&tmp, &a0b0),
-            //            _ => None,
-            //        }
-            //    }            
-            //    _ => None,
-            //}
         }
         _ => None,
     }
@@ -342,26 +305,71 @@ fn multi_big_integer_recursion_plus(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>>
 
 #[test]
 fn test_multi_big_integer_recursion_plus() {
-    assert_eq!(multi_big_integer_recursion(&[1], &[1]), Some(vec![1]));         
-    assert_eq!(multi_big_integer_recursion(&[1,0,0,1], &[2,0,0,2]),
+    assert_eq!(multi_big_integer_recursion_plus(&[1], &[1]), Some(vec![1]));         
+    assert_eq!(multi_big_integer_recursion_plus(&[1,0,0,1], &[2,0,0,2]),
               Some(vec![2,0,0,4,0,0,2]));
-    
-    assert_eq!(multi_big_integer_recursion(&[2,1], &[8,1]), Some(vec![6,1,2]));
-    assert_eq!(multi_big_integer_recursion(&[2,2], &[2,0]), Some(vec![4,4]));
-    assert_eq!(multi_big_integer_recursion(&[4,2,0,1], &[9,8,7,1]),
+    assert_eq!(multi_big_integer_recursion_plus(&[2,1], &[8,1]), Some(vec![6,1,2]));
+    assert_eq!(multi_big_integer_recursion_plus(&[2,2], &[2,0]), Some(vec![4,4]));
+    assert_eq!(multi_big_integer_recursion_plus(&[4,2,0,1], &[9,8,7,1]),
               Some(vec![6,3,9,1,3,8,1]));
-                                                                                
-    assert_eq!(multi_big_integer_recursion(&[4,2,2],
-                                           &[3,0,2]),
-           Some(vec![2,7,4,5,4]));
-                                                                                
-    assert_eq!(multi_big_integer_recursion(&[4,2,2,1,3],
-                                           &[3,0,2,2,1]),
-           Some(vec![2,7,4,6,2,0,1,8,3]));
-                                                                                
-    assert_eq!(multi_big_integer_recursion(&[4,2,2,1,3,7,9,6,5,5],
+
+    assert_eq!(multi_big_integer_recursion_plus(&[4,2,2], &[3,0,2]),
+              Some(vec![2,7,4,5,4]));
+    assert_eq!(multi_big_integer_recursion_plus(&[4,2,2,1,3], &[3,0,2,2,1]),
+              Some(vec![2,7,4,6,2,0,1,8,3]));
+    assert_eq!(multi_big_integer_recursion_plus(&[4,2,2,1,3,7,9,6,5,5],
                                            &[3,0,2,2,1,6,3,2,0,6],),            
-           Some(vec![2,7,4,6,2,5,6,1,3,8,6,9,0,0,9,9,4,5,3,3]));                
+              Some(vec![2,7,4,6,2,5,6,1,3,8,6,9,0,0,9,9,4,5,3,3]));                
+}
+
+
+fn get_multi_time(num1: &[i8], num2: &[i8],
+                  multi_func: fn(&[i8], &[i8]) -> Option<Vec<i8>>) -> f64 {
+
+    if num1.len() < 1000 {
+        let now = Instant::now();
+        for i in 0..1000 {
+            multi_func(num1, num2);
+        }
+        
+        return now.elapsed().as_millis() as f64 / 1000.0;
+    }
+
+    let now = Instant::now();
+    multi_func(num1, num2);
+    now.elapsed().as_millis() as f64 
+}
+
+fn run() {
+
+    let mut len = 10;
+    let multi_func_list = [multi_big_integer, multi_big_integer_recursion,
+                       multi_big_integer_recursion_plus];
+
+    let mut file = File::create("result/data.csv").expect("create failed"); 
+
+    loop {
+        match (new_big_integer(len), new_big_integer(len)) {
+            (Some(num1), Some(num2)) => {
+                //println!("num1 is {}", get_big_integer_string(&num1));
+                //println!("num2 is {}", get_big_integer_string(&num2));
+                
+                //file.wirte_all(len.to_string().as_bytes()).expect("write failed");
+                write!(file, "{},", len).unwrap();
+                for func in multi_func_list {
+                    write!(file, "{},", get_multi_time(&num1, &num2, func)).unwrap();
+                }
+            },
+            _ => break,
+
+        };
+        if len > MAX_VEC_SIZE {break;}
+        len *= 10;
+    };
+
+    //deal with time data
+    //
+    //draw line chart
 }
 
 fn main() {
@@ -369,7 +377,7 @@ fn main() {
     //println!("{:?}", multi_big_integer_recursion(&[4,2,2],&[3,0,2]));
     //println!("{:?}", multi_big_integer_recursion(&[4,2],&[2,0]));
     //multi_big_integer(&[4,2,2,1,3],&[3,0,2,2,1]);
-    //multi_big_integer_recursion(&[2,1], &[8,1]);
-    //run_multi_case();
+    //multi_big_integer_recursion_plus(&[2,1], &[8,1]);
+    run();
     
 }
