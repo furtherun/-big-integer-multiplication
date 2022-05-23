@@ -2,8 +2,12 @@ extern crate rand;
 use rand::{distributions::Uniform, Rng};
 use std::time::Instant;
 use std::fs::File;
-use std::io::Write;
-
+use std::io::{Write, BufRead, BufReader};
+use std::iter::zip;
+use plotlib::page::Page;
+use plotlib::repr::Plot;
+use plotlib::view::ContinuousView;
+use plotlib::style::{PointMarker, PointStyle};
 
 //const MAX_VEC_SIZE: usize = 1_000_000_000;
 
@@ -161,11 +165,11 @@ fn multi_big_integer_recursion(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>> {
            multi_big_integer_recursion(a0, b1),
            multi_big_integer_recursion(a1, b0)) {
         (Some(a0b0), Some(a1b1), Some(a0b1), Some(a1b0)) => {
-            let mut a1b1_shift = shift_big_integer(&a1b1, 
-                                                   num1.len()/2+num2.len()/2).unwrap();
-            let mut a0b1_shift = shift_big_integer(&a0b1, 
-                                                   num2.len()/2).unwrap();
-            let mut a1b0_shift = shift_big_integer(&a1b0, 
+            let a1b1_shift = shift_big_integer(&a1b1, 
+                                               num1.len()/2+num2.len()/2).unwrap();
+            let a0b1_shift = shift_big_integer(&a0b1, 
+                                               num2.len()/2).unwrap();
+            let a1b0_shift = shift_big_integer(&a1b0, 
                                                    num1.len()/2).unwrap();
             //println!("{:?}, {:?}, {:?}, {:?}", a1b1_shift, a0b1_shift, a1b0_shift, a0b0);
 
@@ -288,9 +292,9 @@ fn multi_big_integer_recursion_plus(num1: &[i8], num2: &[i8]) -> Option<Vec<i8>>
 
             //println!("add_ab = {:?}, mid = {:?}", add_ab, mid);
 
-            let mut a1b1_shift = shift_big_integer(&a1b1, 
+            let a1b1_shift = shift_big_integer(&a1b1, 
                                                    num1.len()/2+num2.len()/2).unwrap();
-            let mut mid_shift = shift_big_integer(&mid,
+            let mid_shift = shift_big_integer(&mid,
                                                    num2.len()/2).unwrap();
             
             //println!("high = {:?}, mid = {:?}, low = {:?}", a1b1_shift, mid_shift, a0b0);                                                                              
@@ -328,7 +332,7 @@ fn get_multi_time(num1: &[i8], num2: &[i8],
 
     if num1.len() < 1000 {
         let now = Instant::now();
-        for i in 0..1000 {
+        for _ in 0..1000 {
             multi_func(num1, num2);
         }
         
@@ -340,44 +344,114 @@ fn get_multi_time(num1: &[i8], num2: &[i8],
     now.elapsed().as_millis() as f64 
 }
 
-fn run() {
+fn run(is_display: bool) {
 
     let mut len = 10;
     let multi_func_list = [multi_big_integer, multi_big_integer_recursion,
                        multi_big_integer_recursion_plus];
 
-    let mut file = File::create("result/data.csv").expect("create failed"); 
+    let mut file = File::create("../data.csv").expect("create failed"); 
 
     loop {
         match (new_big_integer(len), new_big_integer(len)) {
             (Some(num1), Some(num2)) => {
-                //println!("num1 is {}", get_big_integer_string(&num1));
-                //println!("num2 is {}", get_big_integer_string(&num2));
+                if is_display {
+                    println!("num1 is {}", get_big_integer_string(&num1));
+                    println!("num2 is {}", get_big_integer_string(&num2));
+                }
                 
                 //file.wirte_all(len.to_string().as_bytes()).expect("write failed");
-                write!(file, "{},", len).unwrap();
-                for func in multi_func_list {
-                    write!(file, "{},", get_multi_time(&num1, &num2, func)).unwrap();
-                }
+                writeln!(file, "{},{},{},{}", len,
+                         get_multi_time(&num1, &num2, multi_func_list[0]),
+                         get_multi_time(&num1, &num2, multi_func_list[1]),
+                         get_multi_time(&num1, &num2, multi_func_list[2]),).unwrap();
+                
+                println!("Big integer length = {} finished.", len);
+                //for func in multi_func_list {
+                //    write!(file, "{},", get_multi_time(&num1, &num2, func)).unwrap();
+                //}
             },
-            _ => break,
+            _ => {
+                println!("Out of memory!");
+                break;
+            }
 
         };
-        if len > MAX_VEC_SIZE {break;}
+
         len *= 10;
     };
 
-    //deal with time data
-    //
-    //draw line chart
 }
 
+
+
+fn draw() {
+    let file = File::open("../data.csv").expect("open failed");
+
+    let mut x_axis: Vec<f64> = vec![];
+    let mut y1_axis: Vec<f64> = vec![];
+    let mut y2_axis: Vec<f64> = vec![];
+    let mut y3_axis: Vec<f64> = vec![];
+                                                              
+    for line in BufReader::new(file).lines() {
+        let info = line.unwrap();
+        let info_list: Vec<&str> = info.split(',').collect();
+                                                              
+        x_axis.push(info_list[0].parse::<f64>()
+                                .unwrap() .log10());
+        y1_axis.push(info_list[1].parse::<f64>()
+                                 .unwrap().log10()); 
+        y2_axis.push(info_list[2].parse::<f64>()
+                                 .unwrap().log10()); 
+        y3_axis.push(info_list[1].parse::<f64>()
+                                 .unwrap().log10()); 
+    }
+                                                              
+    println!("{:?}, {:?}, {:?}, {:?}",
+             x_axis, y1_axis,
+             y2_axis,
+             y3_axis);
+    
+    let data1: Vec<(_, _)>  = zip(x_axis.clone(), y1_axis.clone()).collect();
+    let data2: Vec<(_, _)>  = zip(x_axis.clone(), y2_axis.clone()).collect();
+    let data3: Vec<(_, _)>  = zip(x_axis.clone(), y3_axis.clone()).collect();
+    
+    println!("{:?}, {:?}, {:?}", data1, data2, data3);
+
+    let s1: Plot = Plot::new(data1).point_style(
+        PointStyle::new()
+            .marker(PointMarker::Square) // setting the marker to be a square
+            .colour("#DD3355")
+    ).legend("multi_big_integer".to_string()); // and a custom colour                                                    
+    let s2: Plot = Plot::new(data2).point_style(                               
+        PointStyle::new()
+            .marker(PointMarker::Cross) // setting the marker to be a square
+            .colour("#35C788"),
+    ).legend("multi_big_integer_recursion".to_string()); // and a custom colour
+    let s3: Plot = Plot::new(data3).point_style(                              
+        PointStyle::new()
+            .marker(PointMarker::Circle) // setting the marker to be a square
+            .colour("#00A4FF"),
+    ).legend("multi_big_integer_recursion_plus".to_string()); // and a custom colour
+
+    // The 'view' describes what set of data is drawn         
+    let view = ContinuousView::new()
+        .add(s1)
+        .add(s2)
+        .add(s3)
+        .x_range(0., 10.)
+        .y_range(-2., 10.)
+        .x_label("log of length")
+        .y_label("log of time");
+                                                              
+    // A page with a single view is then saved to an SVG file
+    Page::single(&view).save("../result.svg").unwrap();
+}
+
+
 fn main() {
-    //println!("{:?}", multi_big_integer_recursion(&[2,1],&[8,1]));
-    //println!("{:?}", multi_big_integer_recursion(&[4,2,2],&[3,0,2]));
-    //println!("{:?}", multi_big_integer_recursion(&[4,2],&[2,0]));
-    //multi_big_integer(&[4,2,2,1,3],&[3,0,2,2,1]);
-    //multi_big_integer_recursion_plus(&[2,1], &[8,1]);
-    run();
+
+    run(true);
+    draw();
     
 }
