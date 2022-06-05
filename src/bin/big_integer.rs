@@ -13,13 +13,19 @@ impl BigInteger {
     pub fn new() -> BigInteger {
         BigInteger {
             start: 0,
-            len: 0,
+            len: 1,
+            nums: vec![0; CAPACITY]
+        }
+    }
+    pub fn init(len: usize) -> BigInteger {
+        BigInteger {
+            start: 0,
+            len,
             nums: vec![0; CAPACITY]
         }
     }
     pub fn rand_init(len: usize) -> BigInteger {
-        let mut bi = BigInteger::new();
-        bi.len = len;
+        let mut bi = BigInteger::init(len);
 
         use rand::distributions::{Distribution, Uniform};
 
@@ -33,8 +39,7 @@ impl BigInteger {
         bi
     }
     pub fn from(s: &str) -> BigInteger {
-        let mut bi = BigInteger::new();
-        bi.len =  s.len();
+        let mut bi = BigInteger::init(s.len());
 
         for (i, c) in s.chars().rev().enumerate() {
             bi.nums[i] = c.to_digit(10).unwrap() as i32;
@@ -51,7 +56,7 @@ impl BigInteger {
             .map(|i| i.to_string()).collect::<String>()
     }
     pub fn mult(&mut self, other: &mut BigInteger) -> BigInteger {
-        let mut bi = BigInteger::from("0");
+        let mut bi = BigInteger::new(); //0
 
         if *self == bi || *other == bi {
             return bi;
@@ -94,8 +99,7 @@ impl BigInteger {
             panic!("sub length error");
         }
 
-        let mut bi = BigInteger::new();
-        bi.set_start_len(0, self.len);
+        let mut bi = BigInteger::init(self.len);
 
         for i in 0..bi.len {
             if self.nums[i] < other.nums[i] {
@@ -111,8 +115,7 @@ impl BigInteger {
         bi
     }
     pub fn shift(&mut self, index: usize) -> BigInteger {
-        let mut bi = BigInteger::new();
-        bi.set_start_len(0, index+self.len);
+        let mut bi = BigInteger::init(index+self.len);
 
         for i in 0.. self.len {
             bi.nums[index+i] = self.nums[self.start+i]; 
@@ -126,8 +129,8 @@ impl BigInteger {
             return other.add(self);
         }
 
-        let mut bi = BigInteger::new();
-        bi.set_start_len(0, self.len+1);
+        let mut bi = BigInteger::init(self.len+1);
+
         let mut carry = 0;
 
         for i in 0..bi.len {
@@ -151,9 +154,8 @@ impl BigInteger {
         //high part is not shorter than low part
         let len = self.len / 2;
         
-        let mut bi = BigInteger::new();
-        bi.set_start_len(0, len+1);
-                                                             
+        let mut bi = BigInteger::init(len+1);
+
         for i in 0..len {
             let total = self.nums[self.start+len+i] +
                         self.nums[self.start+i] + carry;
@@ -200,23 +202,28 @@ impl BigInteger {
 
         //self.set_start_len(start1+len1/2, len1-len1/2);
         other.set_start_len(start2, l_len2);
-        let mut hl = self.mult_recur(other);
+        let hl = self.mult_recur(other);
 
         self.set_start_len(start1, l_len1);
         let mut ll = self.mult_recur(other);
 
         other.set_start_len(start2+l_len2, h_len2);
-        let mut lh = self.mult_recur(other);
+        let lh = self.mult_recur(other);
+
+        let mut mid = hl.add(&lh);
 
         hh.set_start_len(0, hh.start+hh.len);
-        hl.set_start_len(0, hl.start+hl.len);
-        lh.set_start_len(0, lh.start+lh.len);
+        //hl.set_start_len(0, hl.start+hl.len);
+        //lh.set_start_len(0, lh.start+lh.len);
         ll.set_start_len(0, ll.start+ll.len);
         //println!("hh={hh}, hl={hl}, lh = {lh}, ll={ll}");
+        mid.set_start_len(0, mid.start+mid.len);
 
         //let bi = hh.add(&hl).add(&lh).add(&ll);
         //println!("res = {bi}");
-        hh.add(&hl).add(&lh).add(&ll)
+        //hh.add(&hl).add(&lh).add(&ll)
+        hh.add(&mid).add(&ll)
+
     }
 
     pub fn mult_recur_pro(&mut self, other: &mut BigInteger)
@@ -259,7 +266,7 @@ impl BigInteger {
         hh = hh.shift(len1/2+len2/2);
 
         //println!("hh={hh},mid={mid},ll={ll}");
-        let ret = hh.add(&mid).add(&ll);
+        //let ret = hh.add(&mid).add(&ll);
         //println!("{ret}");
 
         hh.add(&mid).add(&ll)

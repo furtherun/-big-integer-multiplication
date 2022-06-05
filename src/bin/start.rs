@@ -5,7 +5,7 @@ use std::time::Instant;
 use std::fs::File;
 use std::io::{Write, BufRead, BufReader};
 
-const TEST_SIZE:usize = 1_000;
+const TEST_SIZE:usize = 1_00_000_000;
 fn main() {
     run(false);
 }
