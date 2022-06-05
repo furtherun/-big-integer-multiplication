@@ -185,27 +185,28 @@ impl BigInteger {
             return self.mult(other);
         }
 
-        let len1 = self.len;
+        let l_len1 = self.len/2;
         let start1 = self.start;
-        let len2 = other.len;
+        let l_len2 = other.len/2;
         let start2 = other.start;
 
-        self.set_start_len(start1+len1/2,len1-len1/2);
-        other.set_start_len(start2+len2/2,len2-len2/2);
+        let h_len1 = self.len - l_len1;
+        let h_len2 = other.len - l_len2;
+
+        self.set_start_len(start1+l_len1, h_len1);
+        other.set_start_len(start2+l_len2, h_len2);
         //println!("self = {self}, other = {other}");
         let mut hh = self.mult_recur(other);
 
-        self.set_start_len(start1+len1/2, len1-len1/2);
-        other.set_start_len(start2, len2/2);
+        //self.set_start_len(start1+len1/2, len1-len1/2);
+        other.set_start_len(start2, l_len2);
         let mut hl = self.mult_recur(other);
 
-        self.set_start_len(start1, len1/2);
-        other.set_start_len(start2+len2/2, len2-len2/2);
-        let mut lh = self.mult_recur(other);
-
-        self.set_start_len(start1, len1/2);
-        other.set_start_len(start2, len2/2);
+        self.set_start_len(start1, l_len1);
         let mut ll = self.mult_recur(other);
+
+        other.set_start_len(start2+l_len2, h_len2);
+        let mut lh = self.mult_recur(other);
 
         hh.set_start_len(0, hh.start+hh.len);
         hl.set_start_len(0, hl.start+hl.len);

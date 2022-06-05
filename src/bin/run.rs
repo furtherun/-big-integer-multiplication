@@ -50,9 +50,9 @@ fn get_mult_time(bi1: &mut BigInteger, bi2: &mut BigInteger,
         let now = Instant::now();
         for _ in 0..1000 {
             match tag {
-                1 => bi1.mult(bi2), 
-                2 => bi1.mult_recur(bi2), 
                 3 => bi1.mult_recur_pro(bi2), 
+                2 => bi1.mult_recur(bi2), 
+                1 => bi1.mult(bi2), 
                 _ => panic!("no a tag"),
             };
         }
@@ -63,9 +63,9 @@ fn get_mult_time(bi1: &mut BigInteger, bi2: &mut BigInteger,
     let now = Instant::now();
 
     match tag {
-        1 => bi1.mult(bi2),
-        2 => bi1.mult_recur(bi2),
         3 => bi1.mult_recur_pro(bi2),
+        2 => bi1.mult_recur(bi2),
+        1 => bi1.mult(bi2),
         _ => panic!("no a tag"),
     };
 
