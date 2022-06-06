@@ -1,4 +1,4 @@
-const CAPACITY: usize = 1_000_000_000; 
+const CAPACITY: usize = 1_00_000_000; 
 extern crate rand;
 
 #[derive(Debug)]

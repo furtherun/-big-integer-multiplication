@@ -1,5 +1,5 @@
 [package]
-name = "big-integer-multiplication"
+name = "big_int_mult"
 version = "0.3.3"
 edition = "2021"
 authors = ["furtherun <furtherun@outlook.com>"]
