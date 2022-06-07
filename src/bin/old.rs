@@ -9,10 +9,15 @@ use plotlib::repr::Plot;
 use plotlib::view::ContinuousView;
 use plotlib::style::{PointMarker, PointStyle};
 
-//const MAX_VEC_SIZE: usize = 1_000_000_000;
+const MAX_VEC_SIZE: usize = 1_00_000_000;
 
-const MAX_VEC_SIZE: usize = 100; //test size
+//const MAX_VEC_SIZE: usize = 100_000; //test size
+fn main() {
 
+    run(false);
+    draw();
+    
+}
 fn new_big_integer(len: usize) -> Option<Vec<i32>> {
     // Retruns a random big integer in vec,
     // or None if out of memory.
@@ -356,23 +361,24 @@ fn run(is_display: bool) {
     let multi_func_list = [multi_big_integer, multi_big_integer_recursion,
                        multi_big_integer_recursion_plus];
 
-    let mut file = File::create("data.csv").expect("create failed"); 
+    let mut file = File::create("datas/data1.csv").expect("create failed"); 
 
     loop {
         match (new_big_integer(len), new_big_integer(len)) {
             (Some(num1), Some(num2)) => {
+
+                println!("Big integer length = {len} generated.");
                 if is_display {
                     println!("num1 is {}", get_big_integer_string(&num1));
                     println!("num2 is {}", get_big_integer_string(&num2));
                 }
                 
-                //file.wirte_all(len.to_string().as_bytes()).expect("write failed");
                 writeln!(file, "{},{},{},{}", len,
-                         get_multi_time(&num1, &num2, multi_func_list[0]),
-                         get_multi_time(&num1, &num2, multi_func_list[1]),
-                         get_multi_time(&num1, &num2, multi_func_list[2]),).unwrap();
+                    get_multi_time(&num1, &num2, multi_func_list[0]),
+                    get_multi_time(&num1, &num2, multi_func_list[1]),
+                    get_multi_time(&num1, &num2, multi_func_list[2]),).unwrap();
                 
-                println!("Big integer length = {} finished.", len);
+                println!("Big integer length = {len} finished.");
                 //for func in multi_func_list {
                 //    write!(file, "{},", get_multi_time(&num1, &num2, func)).unwrap();
                 //}
@@ -389,10 +395,9 @@ fn run(is_display: bool) {
 
 }
 
-
-
 fn draw() {
-    let file = File::open("data.csv").expect("open failed");
+    let file = File::open("datas/data1.csv")
+        .expect("open failed");
 
     let mut x_axis: Vec<f64> = vec![];
     let mut y1_axis: Vec<f64> = vec![];
@@ -451,13 +456,5 @@ fn draw() {
         .y_label("log of time");
                                                               
     // A page with a single view is then saved to an SVG file
-    Page::single(&view).save("../result.svg").unwrap();
-}
-
-
-fn main() {
-
-    run(true);
-    draw();
-    
+    Page::single(&view).save("results/result1.svg").unwrap();
 }

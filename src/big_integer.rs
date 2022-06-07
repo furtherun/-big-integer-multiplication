@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 const CAPACITY: usize = 1_00_000_000; 
 extern crate rand;
 
@@ -14,14 +15,14 @@ impl BigInteger {
         BigInteger {
             start: 0,
             len: 1,
-            nums: vec![0; CAPACITY]
+            nums: vec![0; CAPACITY],
         }
     }
     pub fn init(len: usize) -> BigInteger {
         BigInteger {
             start: 0,
             len,
-            nums: vec![0; CAPACITY]
+            nums: vec![0; CAPACITY],
         }
     }
     pub fn rand_init(len: usize) -> BigInteger {
@@ -280,6 +281,7 @@ impl fmt::Display for BigInteger {
         write!(f, "{}", self.to_string())
     }
 }
+
 use std::cmp;
 
 impl cmp::PartialEq for BigInteger {

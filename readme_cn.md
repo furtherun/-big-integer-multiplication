@@ -1,8 +1,8 @@
-# Big Integer Multiplication
+# 大整数乘法
 
-说明文档中文版（Readme Chinese Version）在[这里](readme.md)。
+If you need Readme English Version, click [here](readme.md).
 
-## Directory
+## 目录
 
 ```sh
 $ tree
@@ -34,40 +34,40 @@ $ tree
     └── mult_tests.rs
 ```
 
-## Experimental Setting
+## 环境配置
 
-| Sortware/Hardware |      Version      |
-| :---------------: | :---------------: |
-|        OS         | Linux/Ubuntu20.04 |
-|        RAM        |       64GB        |
-|        CPU        |                   |
-|        Vim        |     8.1.2269      |
-|    Rust(rustc)    |      1.61.0       |
-|       Cargo       |      1.61.0       |
+|  软件/硬件  |       版本        |
+| :---------: | :---------------: |
+|  操作系统   | Linux/Ubuntu20.04 |
+|     RAM     |       64GB        |
+|     CPU     |                   |
+|     Vim     |     8.1.2269      |
+| Rust(rustc) |      1.61.0       |
+|    Cargo    |      1.61.0       |
 
-## Program Running
+## 程序运行
 
-### Download
+### 下载
 
 ```sh
 git clone https://github.com/furtherun/big-integer-multiplication
 ```
 
-### Compile with Cargo
+### 编译
 
 ```sh
 cd big-integer-multiplication
 cargo build --release
 ```
 
-### Run an Example
+### 运行一个例子
 
 ```sh
 cargo run --example rand_case
 ```
 
-This example randomly generates two 10-digits large integers,
-multiplies them in three ways, and prints the result.
+这个例子会随机生成两个10位的大整数，
+并且使用三种方式分别计算大整数乘法，并将结果打印出来。
 
 ```output
 x = 2010695756, y = 3273900753
@@ -77,14 +77,13 @@ res2=6582818349622304268
 res3=6582817397422304268
 ```
 
-### Run Experiment
+### 运行实验
 
 ```sh
 cargo run --bin big_int_mult
 ```
 
-If you see text like this in a command-line window,
-the program is simulating the big integer multiplication.
+如果你在命令行窗口看到类似如下文本，说明程序正在进行模拟大整数计算。
 
 ```output
 Big integer length = 10 generated.
@@ -98,33 +97,31 @@ mult takes 187 ms, mult_recur takes 420 ms, mult_recur_pro takes 0.112 ms
 ...
 ```
 
-The run time datas are save in directory `/datas`.
+乘法运行时间数据保存在`/datas`文件夹中。
 
-### Drawing
+### 绘图
 
 ```sh
 cargo run --bin draw
 ```
 
-And the result drawings are save in directory `/results`.
-However, Rust drawing is less than ideal now,
-so code by Python is given for drawing,
-and you can be run `draw.py` after getting the data.
+绘图结果保存在`/results`文件夹中。
+目前Rust的绘图效果不太理想，这里提供了Python绘图的代码，可以在得到数据后，运行`draw.py`。
 
-## Result Show
+## 结果展示
 
 ![result](results/result_cmp_py.png)
 
-## Outdated methods
+## 未优化的方法
 
 ```sh
 cargo run --bin old
 ```
 
-The unoptimized method runs much slower compared to the optimized method.
+未优化的方法运行速度相对优化后的方法来说要慢很多。
 
-## Still Bugs
+## 可能存在的问题
 
-1. `test_mult_recur()` can not pass;
-2. `mult_recur_pro()` sometimes will caculate wrong answer, such as in
-`cargo run --example bad_case`, some digit in middle of res3 is wrong。
+1. `test_mult_recur()`测试存在问题，报告内存溢出，但我并没有找到造成错误的原因；
+2. `mult_recur_pro()`方法的实验结果表现很好，但这个函数计算结果有时候会出错，可以运行
+`cargo run --example bad_case`看出这种情况下中间几位似乎有些问题。

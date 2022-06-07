@@ -13,7 +13,8 @@ fn main() {
 fn run(is_display: bool) { 
     let mut len:usize = 10;
 
-    let mut file = File::create("data.csv").expect("create failed"); 
+    let mut file = File::create("datas/data2.csv")
+        .expect("create failed"); 
 
     type BI = BigInteger;
     loop {

@@ -1,0 +1,95 @@
+<svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(72, 364)">
+<g>
+<g>
+<rect fill="#DD3355" height="10" width="10" x="75" y="-32.59836945468261"/>
+<rect fill="#DD3355" height="10" width="10" x="155" y="-115.91418629328226"/>
+<rect fill="#DD3355" height="10" width="10" x="235" y="-212.60195267852163"/>
+<rect fill="#DD3355" height="10" width="10" x="315" y="-309.892401224375"/>
+</g>
+</g>
+<g transform="translate(380, -340)">
+<text font-size="12" text-anchor="start" x="0" y="0">
+mult
+</text>
+</g>
+<g>
+<g>
+<path d="M75,-78.62816 l10,10 m-10,0 l10,-10 z" fill="none" stroke="#35C788" stroke-width="2"/>
+<path d="M155,-87.43685 l10,10 m-10,0 l10,-10 z" fill="none" stroke="#35C788" stroke-width="2"/>
+<path d="M235,-229.65804 l10,10 m-10,0 l10,-10 z" fill="none" stroke="#35C788" stroke-width="2"/>
+<path d="M315,-316.4485 l10,10 m-10,0 l10,-10 z" fill="none" stroke="#35C788" stroke-width="2"/>
+</g>
+</g>
+<g transform="translate(380, -322)">
+<text font-size="12" text-anchor="start" x="0" y="0">
+mult_recur
+</text>
+</g>
+<g>
+<g>
+<circle cx="80" cy="-12.398950247874863" fill="#00A4FF" r="5"/>
+<circle cx="160" cy="-20.951954259150817" fill="#00A4FF" r="5"/>
+<circle cx="240" cy="-50.962018243980246" fill="#00A4FF" r="5"/>
+<circle cx="320" cy="-96.54379001070477" fill="#00A4FF" r="5"/>
+</g>
+</g>
+<g transform="translate(380, -304)">
+<text font-size="12" text-anchor="start" x="0" y="0">
+mult_recur_pro
+</text>
+</g>
+<g>
+<g>
+<line stroke="black" stroke-width="1" x1="0" x2="0" y1="0" y2="10"/>
+<line stroke="black" stroke-width="1" x1="160" x2="160" y1="0" y2="10"/>
+<line stroke="black" stroke-width="1" x1="320" x2="320" y1="0" y2="10"/>
+<line stroke="black" stroke-width="1" x1="480" x2="480" y1="0" y2="10"/>
+</g>
+<line stroke="black" stroke-width="1" x1="0" x2="480" y1="0" y2="0"/>
+<g>
+<text font-size="12" text-anchor="middle" x="0" y="20">
+0
+</text>
+<text font-size="12" text-anchor="middle" x="160" y="20">
+2
+</text>
+<text font-size="12" text-anchor="middle" x="320" y="20">
+4
+</text>
+<text font-size="12" text-anchor="middle" x="480" y="20">
+6
+</text>
+</g>
+<text font-size="12" text-anchor="middle" x="240" y="30">
+log of length
+</text>
+</g>
+<g>
+<g>
+<line stroke="black" stroke-width="1" x1="0" x2="-10" y1="-0" y2="-0"/>
+<line stroke="black" stroke-width="1" x1="0" x2="-10" y1="-97.14285714285714" y2="-97.14285714285714"/>
+<line stroke="black" stroke-width="1" x1="0" x2="-10" y1="-194.28571428571428" y2="-194.28571428571428"/>
+<line stroke="black" stroke-width="1" x1="0" x2="-10" y1="-291.42857142857144" y2="-291.42857142857144"/>
+</g>
+<line stroke="black" stroke-width="1" x1="0" x2="0" y1="0" y2="-340"/>
+<g>
+<text dominant-baseline="middle" font-size="12" text-anchor="end" x="-15" y="-0">
+-2
+</text>
+<text dominant-baseline="middle" font-size="12" text-anchor="end" x="-15" y="-97.14285714285714">
+0
+</text>
+<text dominant-baseline="middle" font-size="12" text-anchor="end" x="-15" y="-194.28571428571428">
+2
+</text>
+<text dominant-baseline="middle" font-size="12" text-anchor="end" x="-15" y="-291.42857142857144">
+4
+</text>
+</g>
+<text font-size="12" text-anchor="middle" transform="rotate(-90 -24 -170)" x="-24" y="-182">
+log of time
+</text>
+</g>
+</g>
+</svg>
