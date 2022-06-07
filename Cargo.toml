@@ -1,6 +1,6 @@
 [package]
 name = "big_int_mult"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2021"
 authors = ["furtherun <furtherun@outlook.com>"]
 
