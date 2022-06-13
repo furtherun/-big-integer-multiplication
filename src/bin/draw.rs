@@ -58,8 +58,8 @@ fn draw() {
         .add(s1)
         .add(s2)
         .add(s3)
-        .x_range(0., 6.)
-        .y_range(-2., 5.)
+        .x_range(0., 7.)
+        .y_range(-2.5, 10.0)
         .x_label("log of length")
         .y_label("log of time");
                                                               
