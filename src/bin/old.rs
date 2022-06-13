@@ -414,7 +414,7 @@ fn draw() {
                                  .unwrap().log10()); 
         y2_axis.push(info_list[2].parse::<f64>()
                                  .unwrap().log10()); 
-        y3_axis.push(info_list[1].parse::<f64>()
+        y3_axis.push(info_list[3].parse::<f64>()
                                  .unwrap().log10()); 
     }
                                                               
@@ -450,8 +450,8 @@ fn draw() {
         .add(s1)
         .add(s2)
         .add(s3)
-        .x_range(0., 10.)
-        .y_range(-2., 10.)
+        .x_range(0., 6.)
+        .y_range(-2., 9.)
         .x_label("log of length")
         .y_label("log of time");
                                                               
